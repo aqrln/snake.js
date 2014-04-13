@@ -11,6 +11,7 @@
 	var INITIAL_SNAKE_LENGTH = 30;
 	var SNAKE_CHUNK_GAP = 3;
 	var INITIAL_VELOCITY = 2;
+	var ANGULAR_SPEED = Math.PI;
 
 	var KEY_UP = 38;
 	var KEY_DOWN = 40;
@@ -115,6 +116,9 @@
 		this.velocity = INITIAL_VELOCITY;
 		this.points = 0;
 
+		this.isTurningLeft = false;
+		this.isTurningRight = false;
+
 		for (var i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
 			this.chunks.push(new SnakeChunk(W / 2, H / 2 - SNAKE_CHUNK_GAP*i, -Math.PI / 2));
 		}
@@ -135,6 +139,13 @@
 		}
 
 		this.update = function () {
+			if (this.isTurningLeft) {
+				this.chunks[this.chunks.length - 1].angle -= ANGULAR_SPEED / FPS;
+			}
+			if (this.isTurningRight) {
+				this.chunks[this.chunks.length - 1].angle += ANGULAR_SPEED / FPS;
+			}
+
 			var pos = this.chunks[this.chunks.length - 1].update(
 				true, this.velocity, this.chunks, function () {
 					switchState(new Menu());
@@ -157,10 +168,21 @@
 		this.keyDown = function (event) {
 			switch (event.keyCode) {
 				case KEY_LEFT:
-					this.chunks[this.chunks.length - 1].angle -= Math.PI / 8;
+					this.isTurningLeft = true;
 					break;
 				case KEY_RIGHT:
-					this.chunks[this.chunks.length - 1].angle += Math.PI / 8;
+					this.isTurningRight = true;
+					break;
+			}
+		}
+
+		this.keyUp = function (event) {
+			switch (event.keyCode) {
+				case KEY_LEFT:
+					this.isTurningLeft = false;
+					break;
+				case KEY_RIGHT:
+					this.isTurningRight = false;
 					break;
 			}
 		}
@@ -192,6 +214,9 @@
 		this.keyDown = function (event) {
 			switchState(new Game());
 		}
+
+		this.keyUp = function (event) {
+		}
 	}
 
 
@@ -200,6 +225,10 @@
 		canvas.onmousedown = state.mouseDown;
 		document.body.onkeydown = function (event) {
 			state.keyDown(event);
+			return false;
+		}
+		document.body.onkeyup = function (event) {
+			state.keyUp(event);
 			return false;
 		}
 	}
