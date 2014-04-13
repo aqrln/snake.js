@@ -210,7 +210,7 @@
 	var Menu = function () {
 
 		this.draw = function() {
-			ctx.fillStyle = 'rgba(190, 216, 232, 0.05)';
+			ctx.fillStyle = 'rgba(225, 245, 220, 0.05)';
 			ctx.fillRect(0, 0, W, H);
 
 			ctx.fillStyle = 'rgb(0, 0, 0)';
@@ -249,16 +249,16 @@
 		this.score = score;
 
 		this.draw = function() {
-			ctx.fillStyle = 'rgba(240, 200, 100, 0.05)';
+			ctx.fillStyle = 'rgba(225, 245, 220, 0.05)'
 			ctx.fillRect(0, 0, W, H);
 
 			ctx.fillStyle = 'rgb(0, 0, 0)';
 			ctx.font = '72px sans-serif';
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'top';
-			ctx.fillText('Your score: ' + this.score, W / 2, 120);
+			ctx.fillText('Your score: ' + this.score, W / 2, 200);
 			ctx.font = '24px sans-serif';
-			ctx.fillText('Press any key to try again', W / 2, 240);
+			ctx.fillText('Press any key to try again', W / 2, 320);
 		}
 
 		this.update = function () {
