@@ -34,14 +34,27 @@
 			this.angle = newPos.angle;
 		}
 
-		this.update = function (velocity) {
+		this.update = function (isHead, param, chunks, callback) {
 			var pos = this.getPosition();
 
-			this.x += velocity * Math.cos(this.angle);
-			this.y += velocity * Math.sin(this.angle);
+			if (isHead) {
+				var velocity = param;
 
-			if (this.x >= W || this.x < 0 || this.y >= H || this.y < 0) {
-				switchState(new Menu());
+				this.x += velocity * Math.cos(this.angle);
+				this.y += velocity * Math.sin(this.angle);
+
+				if (this.x >= W || this.x < 0 || this.y >= H || this.y < 0) {
+					callback('collision');
+				}
+
+				for (var i = 0; i < chunks.length - 3; i++) {
+					if (Math.abs(this.x - chunks[i].x) < 3 && Math.abs(this.y - chunks[i].y) < 3) {
+						callback('collision');
+					}
+				}
+			} else {
+				var newPos = param;
+				this.setPosition(newPos)
 			}
 
 			return pos;
@@ -59,7 +72,7 @@
 
 	var Game = function () {
 		this.chunks = [];
-		this.velocity = 3;
+		this.velocity = 2;
 
 		for (var i = 0; i < 50; i++) {
 			this.chunks.push(new SnakeChunk(W / 2, H / 2 - 3*i, -Math.PI / 2));
@@ -75,11 +88,16 @@
 		}
 
 		this.update = function () {
-			var pos = this.chunks[this.chunks.length - 1].update(this.velocity);
+			var pos = this.chunks[this.chunks.length - 1].update(
+				true, this.velocity, this.chunks, function (message) {
+					switch (message) {
+						case 'collision':
+							switchState(new Menu());
+							break;
+					}
+				});
 			for (var i = this.chunks.length - 2; i >= 0; i--) {
-				var newPos = this.chunks[i].getPosition();
-				this.chunks[i].setPosition(pos);
-				pos = newPos;
+				pos = this.chunks[i].update(false, pos);
 			}
 		}
 
