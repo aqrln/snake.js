@@ -203,7 +203,7 @@
 	var Menu = function () {
 
 		this.draw = function() {
-			ctx.fillStyle = 'rgb(200, 173, 18)';
+			ctx.fillStyle = 'rgba(240, 240, 200, 0.1)';
 			ctx.fillRect(0, 0, W, H);
 
 			ctx.fillStyle = 'rgb(0, 0, 0)';
