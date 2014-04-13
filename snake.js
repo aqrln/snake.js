@@ -34,7 +34,7 @@
 			this.angle = newPos.angle;
 		}
 
-		this.update = function (isHead, param, chunks, callback) {
+		this.update = function (isHead, param, chunks, collisionCallback) {
 			var pos = this.getPosition();
 
 			if (isHead) {
@@ -44,12 +44,12 @@
 				this.y += velocity * Math.sin(this.angle);
 
 				if (this.x >= W || this.x < 0 || this.y >= H || this.y < 0) {
-					callback('collision');
+					collisionCallback();
 				}
 
 				for (var i = 0; i < chunks.length - 3; i++) {
 					if (Math.abs(this.x - chunks[i].x) < 3 && Math.abs(this.y - chunks[i].y) < 3) {
-						callback('collision');
+						collisionCallback();
 					}
 				}
 			} else {
@@ -70,13 +70,49 @@
 	}
 
 
+	var Food = function () {
+		var generateCoordinate = function (maximum) {
+			return Math.floor(Math.random() * maximum);
+		}
+
+		var foodRadius = 5;
+
+		this.newPosition = function () {
+			this.x = generateCoordinate(W);
+			this.y = generateCoordinate(H);
+		}
+
+		this.update = function (snakeHead, eatenCallback) {
+			if (Math.abs(snakeHead.x - this.x) < foodRadius &&
+				Math.abs(snakeHead.y - this.y) < foodRadius) {
+				this.newPosition();
+			}
+			eatenCallback();
+		}
+
+		this.draw = function () {
+			ctx.fillStyle = '#ff0000';
+			ctx.beginPath();
+			ctx.arc(this.x, this.y, foodRadius, 0, Math.PI * 2);
+			ctx.fill();
+			ctx.closePath();
+		}
+
+		this.newPosition();
+	}
+
+
 	var Game = function () {
 		this.chunks = [];
+		this.food = [];
 		this.velocity = 2;
+		this.points = 0;
 
 		for (var i = 0; i < 50; i++) {
 			this.chunks.push(new SnakeChunk(W / 2, H / 2 - 3*i, -Math.PI / 2));
 		}
+
+		this.food.push(new Food());
 
 		this.draw = function () {
 			ctx.fillStyle = '#ffffff';
@@ -85,19 +121,26 @@
 			this.chunks.forEach(function (chunk) {
 				chunk.draw();
 			});
+
+			this.food.forEach(function (foodItem) {
+				foodItem.draw();
+			});
 		}
 
 		this.update = function () {
 			var pos = this.chunks[this.chunks.length - 1].update(
-				true, this.velocity, this.chunks, function (message) {
-					switch (message) {
-						case 'collision':
-							switchState(new Menu());
-							break;
-					}
+				true, this.velocity, this.chunks, function () {
+					switchState(new Menu());
 				});
 			for (var i = this.chunks.length - 2; i >= 0; i--) {
 				pos = this.chunks[i].update(false, pos);
+			}
+
+			var self = this;
+			for (var i = 0; i < this.food.length; i++) {
+				this.food[i].update(this.chunks[this.chunks.length - 1], function () {
+					self.points++;
+				});
 			}
 		}
 
