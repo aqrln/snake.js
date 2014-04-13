@@ -4,6 +4,14 @@
 	var W = 600;
 	var H = 600;
 
+	var SNAKE_CHUNK_RADIUS = 3;
+	var COLLISION_SENSIBILITY_RADIUS = 3;
+	var UNCOLLIDABLE_SNAKE_HEAD_LENGTH = 3;
+	var FOOD_RADIUS = 5;
+	var INITIAL_SNAKE_LENGTH = 30;
+	var SNAKE_CHUNK_GAP = 3;
+	var INITIAL_VELOCITY = 2;
+
 	var KEY_UP = 38;
 	var KEY_DOWN = 40;
 	var KEY_LEFT = 37;
@@ -47,8 +55,9 @@
 					collisionCallback();
 				}
 
-				for (var i = 0; i < chunks.length - 3; i++) {
-					if (Math.abs(this.x - chunks[i].x) < 3 && Math.abs(this.y - chunks[i].y) < 3) {
+				for (var i = 0; i < chunks.length - UNCOLLIDABLE_SNAKE_HEAD_LENGTH; i++) {
+					if (Math.abs(this.x - chunks[i].x) < COLLISION_SENSIBILITY_RADIUS &&
+						Math.abs(this.y - chunks[i].y) < COLLISION_SENSIBILITY_RADIUS) {
 						collisionCallback();
 					}
 				}
@@ -63,7 +72,7 @@
 		this.draw = function () {
 			ctx.fillStyle = '#000000';
 			ctx.beginPath();
-			ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+			ctx.arc(this.x, this.y, SNAKE_CHUNK_RADIUS, 0, Math.PI * 2);
 			ctx.fill();
 			ctx.closePath();
 		}
@@ -75,16 +84,14 @@
 			return Math.floor(Math.random() * maximum);
 		}
 
-		var foodRadius = 5;
-
 		this.newPosition = function () {
 			this.x = generateCoordinate(W);
 			this.y = generateCoordinate(H);
 		}
 
 		this.update = function (snakeHead, eatenCallback) {
-			if (Math.abs(snakeHead.x - this.x) < foodRadius &&
-				Math.abs(snakeHead.y - this.y) < foodRadius) {
+			if (Math.abs(snakeHead.x - this.x) < FOOD_RADIUS &&
+				Math.abs(snakeHead.y - this.y) < FOOD_RADIUS) {
 				this.newPosition();
 			}
 			eatenCallback();
@@ -93,7 +100,7 @@
 		this.draw = function () {
 			ctx.fillStyle = '#ff0000';
 			ctx.beginPath();
-			ctx.arc(this.x, this.y, foodRadius, 0, Math.PI * 2);
+			ctx.arc(this.x, this.y, FOOD_RADIUS, 0, Math.PI * 2);
 			ctx.fill();
 			ctx.closePath();
 		}
@@ -105,11 +112,11 @@
 	var Game = function () {
 		this.chunks = [];
 		this.food = [];
-		this.velocity = 2;
+		this.velocity = INITIAL_VELOCITY;
 		this.points = 0;
 
-		for (var i = 0; i < 50; i++) {
-			this.chunks.push(new SnakeChunk(W / 2, H / 2 - 3*i, -Math.PI / 2));
+		for (var i = 0; i < INITIAL_SNAKE_LENGTH; i++) {
+			this.chunks.push(new SnakeChunk(W / 2, H / 2 - SNAKE_CHUNK_GAP*i, -Math.PI / 2));
 		}
 
 		this.food.push(new Food());
