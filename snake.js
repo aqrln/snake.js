@@ -12,6 +12,9 @@
 	var SNAKE_CHUNK_GAP = 3;
 	var INITIAL_VELOCITY = 2;
 	var ANGULAR_SPEED = Math.PI;
+	var NEW_CHUNKS_PER_DINNER = 3;
+	var FOOD_INCREASE_STEP = 5;
+	var VELOCITY_INCREASE = 0.3;
 
 	var KEY_UP = 38;
 	var KEY_DOWN = 40;
@@ -94,8 +97,8 @@
 			if (Math.abs(snakeHead.x - this.x) < FOOD_RADIUS &&
 				Math.abs(snakeHead.y - this.y) < FOOD_RADIUS) {
 				this.newPosition();
+				eatenCallback();
 			}
-			eatenCallback();
 		}
 
 		this.draw = function () {
@@ -158,6 +161,14 @@
 			for (var i = 0; i < this.food.length; i++) {
 				this.food[i].update(this.chunks[this.chunks.length - 1], function () {
 					self.points++;
+					for (var j = 0; j < NEW_CHUNKS_PER_DINNER; j++) {
+						self.chunks.unshift(new SnakeChunk(
+							self.chunks[0].x, self.chunks[0].y, self.chunks[0].angle));
+					}
+					if (self.points % FOOD_INCREASE_STEP == 0) {
+						self.food.push(new Food());
+					}
+					self.velocity += VELOCITY_INCREASE;
 				});
 			}
 		}
