@@ -139,6 +139,12 @@
 			this.food.forEach(function (foodItem) {
 				foodItem.draw();
 			});
+
+			ctx.font = '30px sans-serif';
+			ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+			ctx.textBaseline = 'top';
+			ctx.textAlign = 'right';
+			ctx.fillText(this.points, W, 0);
 		}
 
 		this.update = function () {
@@ -149,15 +155,16 @@
 				this.chunks[this.chunks.length - 1].angle += ANGULAR_SPEED / FPS;
 			}
 
+			var self = this;
+
 			var pos = this.chunks[this.chunks.length - 1].update(
 				true, this.velocity, this.chunks, function () {
-					switchState(new Menu());
+					switchState(new GameOver(self.points));
 				});
 			for (var i = this.chunks.length - 2; i >= 0; i--) {
 				pos = this.chunks[i].update(false, pos);
 			}
 
-			var self = this;
 			for (var i = 0; i < this.food.length; i++) {
 				this.food[i].update(this.chunks[this.chunks.length - 1], function () {
 					self.points++;
@@ -203,16 +210,55 @@
 	var Menu = function () {
 
 		this.draw = function() {
-			ctx.fillStyle = 'rgba(240, 240, 200, 0.1)';
+			ctx.fillStyle = 'rgba(240, 200, 100, 0.05)';
 			ctx.fillRect(0, 0, W, H);
 
 			ctx.fillStyle = 'rgb(0, 0, 0)';
 			ctx.beginPath();
-			ctx.moveTo(W / 2 - 50, H / 2 - 50);
-			ctx.lineTo(W / 2 - 50, H / 2 + 50);
-			ctx.lineTo(W / 2 + 50, H / 2);
+			ctx.moveTo(W / 2 - 50, H / 2 + 50);
+			ctx.lineTo(W / 2 - 50, H / 2 + 150);
+			ctx.lineTo(W / 2 + 50, H / 2 + 100);
 			ctx.fill();
 			ctx.closePath();
+
+			ctx.font = '100px sans-serif';
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'top';
+			ctx.fillText('Snake.js', W / 2, 120);
+			ctx.font = '24px sans-serif';
+			ctx.fillText('Use the left and right arrow keys to control the snake', W / 2, 240);
+		}
+
+		this.update = function () {
+		}
+
+		this.mouseDown = function (event) {
+			switchState(new Game());
+		}
+
+		this.keyDown = function (event) {
+			switchState(new Game());
+		}
+
+		this.keyUp = function (event) {
+		}
+	}
+
+
+	var GameOver = function (score) {
+		this.score = score;
+
+		this.draw = function() {
+			ctx.fillStyle = 'rgba(240, 200, 100, 0.05)';
+			ctx.fillRect(0, 0, W, H);
+
+			ctx.fillStyle = 'rgb(0, 0, 0)';
+			ctx.font = '72px sans-serif';
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'top';
+			ctx.fillText('Your score: ' + this.score, W / 2, 120);
+			ctx.font = '24px sans-serif';
+			ctx.fillText('Press any key to try again', W / 2, 240);
 		}
 
 		this.update = function () {
