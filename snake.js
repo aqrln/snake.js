@@ -15,29 +15,71 @@
 	var state;
 
 
-	var Game = function () {
-		this.x = W / 2;
-		this.y = H / 2;
-		this.angle = Math.PI / 2;
-		this.velocity = 1;
+	var SnakeChunk = function (x, y, angle) {
+		this.x = x;
+		this.y = y;
+		this.angle = angle;
+
+		this.getPosition = function () {
+			return {
+				x: this.x,
+				y: this.y,
+				angle: this.angle
+			};
+		}
+
+		this.setPosition = function (newPos) {
+			this.x = newPos.x;
+			this.y = newPos.y;
+			this.angle = newPos.angle;
+		}
+
+		this.update = function (velocity) {
+			var pos = this.getPosition();
+
+			this.x += velocity * Math.cos(this.angle);
+			this.y += velocity * Math.sin(this.angle);
+
+			if (this.x >= W || this.x < 0 || this.y >= H || this.y < 0) {
+				switchState(new Menu());
+			}
+
+			return pos;
+		}
 
 		this.draw = function () {
-			ctx.fillStyle = '#ffffff';
-			ctx.fillRect(0, 0, W, H);
-
 			ctx.fillStyle = '#000000';
 			ctx.beginPath();
 			ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
 			ctx.fill();
 			ctx.closePath();
 		}
+	}
+
+
+	var Game = function () {
+		this.chunks = [];
+		this.velocity = 3;
+
+		for (var i = 0; i < 50; i++) {
+			this.chunks.push(new SnakeChunk(W / 2, H / 2 - 3*i, -Math.PI / 2));
+		}
+
+		this.draw = function () {
+			ctx.fillStyle = '#ffffff';
+			ctx.fillRect(0, 0, W, H);
+
+			this.chunks.forEach(function (chunk) {
+				chunk.draw();
+			});
+		}
 
 		this.update = function () {
-			this.x += this.velocity * Math.cos(this.angle);
-			this.y += this.velocity * Math.sin(this.angle);
-
-			if (this.x >= W || this.x < 0 || this.y >= H || this.y < 0) {
-				switchState(new Menu());
+			var pos = this.chunks[this.chunks.length - 1].update(this.velocity);
+			for (var i = this.chunks.length - 2; i >= 0; i--) {
+				var newPos = this.chunks[i].getPosition();
+				this.chunks[i].setPosition(pos);
+				pos = newPos;
 			}
 		}
 
@@ -47,14 +89,14 @@
 		this.keyDown = function (event) {
 			switch (event.keyCode) {
 				case KEY_LEFT:
-					this.angle -= Math.PI / 8;
+					this.chunks[this.chunks.length - 1].angle -= Math.PI / 8;
 					break;
 				case KEY_RIGHT:
-					this.angle += Math.PI / 8;
+					this.chunks[this.chunks.length - 1].angle += Math.PI / 8;
 					break;
 			}
 		}
-	};
+	}
 
 
 	var Menu = function () {
@@ -82,7 +124,7 @@
 		this.keyDown = function (event) {
 			switchState(new Game());
 		}
-	};
+	}
 
 
 	function switchState(newState) {
