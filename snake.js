@@ -224,9 +224,9 @@
 			ctx.font = '100px sans-serif';
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'top';
-			ctx.fillText('Snake.js', W / 2, 120);
+			ctx.fillText('Snake.js', W / 2, 120, W);
 			ctx.font = '24px sans-serif';
-			ctx.fillText('Use the left and right arrow keys to control the snake', W / 2, 240);
+			ctx.fillText('Use the left and right arrow keys to control the snake', W / 2, 240, W);
 		}
 
 		this.update = function () {
@@ -256,9 +256,9 @@
 			ctx.font = '72px sans-serif';
 			ctx.textAlign = 'center';
 			ctx.textBaseline = 'top';
-			ctx.fillText('Your score: ' + this.score, W / 2, 200);
+			ctx.fillText('Your score: ' + this.score, W / 2, 200, W);
 			ctx.font = '24px sans-serif';
-			ctx.fillText('Press any key to try again', W / 2, 320);
+			ctx.fillText('Press any key to try again', W / 2, 320, W);
 		}
 
 		this.update = function () {
