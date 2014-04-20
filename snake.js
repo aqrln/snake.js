@@ -26,6 +26,14 @@
 
 	var state;
 
+	var GameState = {
+		update: function () {},
+		draw: function () {},
+		mouseDown: function () {},
+		keyDown: function () {},
+		keyUp: function () {}
+	};
+
 
 	var SnakeChunk = function (x, y, angle) {
 		this.x = x;
@@ -180,9 +188,6 @@
 			}
 		}
 
-		this.mouseDown = function (event) {
-		}
-
 		this.keyDown = function (event) {
 			switch (event.keyCode) {
 				case KEY_LEFT:
@@ -205,10 +210,10 @@
 			}
 		}
 	}
+	Game.prototype = GameState;
 
 
 	var Menu = function () {
-
 		this.draw = function() {
 			ctx.fillStyle = 'rgba(225, 245, 220, 0.05)';
 			ctx.fillRect(0, 0, W, H);
@@ -229,9 +234,6 @@
 			ctx.fillText('Use the left and right arrow keys to control the snake', W / 2, 240, W);
 		}
 
-		this.update = function () {
-		}
-
 		this.mouseDown = function (event) {
 			switchState(new Game());
 		}
@@ -239,13 +241,13 @@
 		this.keyDown = function (event) {
 			switchState(new Game());
 		}
-
-		this.keyUp = function (event) {
-		}
 	}
+	Menu.prototype = GameState;
 
 
 	var GameOver = function (score) {
+		this.prototype = GameState;
+
 		this.score = score;
 
 		this.draw = function() {
@@ -261,9 +263,6 @@
 			ctx.fillText('Press any key to try again', W / 2, 320, W);
 		}
 
-		this.update = function () {
-		}
-
 		this.mouseDown = function (event) {
 			switchState(new Game());
 		}
@@ -271,10 +270,8 @@
 		this.keyDown = function (event) {
 			switchState(new Game());
 		}
-
-		this.keyUp = function (event) {
-		}
 	}
+	GameOver.prototype = GameState;
 
 
 	function switchState(newState) {
